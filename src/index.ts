@@ -14,6 +14,11 @@ app.use(cors({
 }));
 
 app.get('/channels/*', async (req, res) => {
+	if (req.headers.origin != 'https://theframedrops.com') {
+		res.status(500).send();
+		return;
+	}
+
 	const channels = req.path.split("/").splice(2);
 	const ret: {[channel: string]: ChannelInfo} = {};
 
