@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 
 import { PORT } from './constants/env';
-import { isChannelLive } from './services/twitch';
+import { ChannelInfo, getChannelInfo } from './services/twitch';
 
 const app = express();
 
@@ -15,13 +15,14 @@ app.use(cors({
 
 app.get('/channels/*', async (req, res) => {
 	const channels = req.path.split("/").splice(2);
-	const isLive: {[channel: string]: boolean} = {};
+	const ret: {[channel: string]: ChannelInfo} = {};
 
 	await Promise.all(channels.map(async (channel) => {
-		isLive[channel] = await isChannelLive(channel);
+		const info = await getChannelInfo(channel);
+		if (info) ret[channel] = info;
 	}));
 
-	res.json(isLive);
+	res.json(ret);
 });
 
 app.listen(PORT, () => {
