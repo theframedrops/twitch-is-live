@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tfd-twitch-is-live
+    command: npm run start:prod
+    ports:
+      - "1032:3000"
+    restart: always
