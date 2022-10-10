@@ -13,17 +13,19 @@ app.use(cors({
 	origin: ['https://theframedrops.com', /^http\:\/\/127\.0\.0\.1\:/]
 }));
 
-function resolveTimeout<T>(fun: () => Promise<T>, timeout: number) : Promise<T|null> {
+function resolveTimeout<T>(promise: Promise<T>, timeout: number, otherwise: T) : Promise<T> {
 	return new Promise((resolve) => {
-		setTimeout(() => resolve(null), timeout);
-		fun().then(resolve);
+		setTimeout(() => resolve(otherwise), timeout);
+		promise.then(resolve);
 	});
 }
+
+let cache: Record<string, ChannelInfo> = {};
 
 app.get('/channels/*', async (req, res) => {
 	if (req.headers.origin !== 'https://theframedrops.com' && !req.headers.origin?.startsWith('http://127.0.0.1:')) {
 		res.status(500).send();
-		return;3
+		return;
 	}
 
 	const channels = req.path.split("/").splice(2);
@@ -31,11 +33,16 @@ app.get('/channels/*', async (req, res) => {
 
 	await Promise.all(channels.map(async (channel) => {
 		const info = await resolveTimeout(
-			() => getChannelInfo(channel),
-			1000
+			getChannelInfo(channel),
+			1000,
+			cache[channel]
 		);
 
-		if (info) ret[channel] = info;
+
+		if (info) {
+			cache[channel] = info;
+			ret[channel] = info;
+		}
 	}));
 
 	res.json(ret);
