@@ -27,6 +27,7 @@ app.get('/channels/*', async (req, res) => {
 		if (info) ret[channel] = info;
 	}));
 
+	res.setHeader("Cache-Control", "public, max-age=30");
 	res.json(ret);
 });
 
