@@ -10,7 +10,7 @@ const app = express();
 
 app.use(helmet());
 app.use(cors({
-	origin: ['https://theframedrops.com']
+	origin: ['https://theframedrops.com', /^http\:\/\/127\.0\.0\.1\:/]
 }));
 
 app.get('/channels/*', async (req, res) => {
