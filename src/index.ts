@@ -14,7 +14,7 @@ app.use(cors({
 }));
 
 app.get('/channels/*', async (req, res) => {
-	if (req.headers.origin != 'https://theframedrops.com') {
+	if (req.headers.origin !== 'https://theframedrops.com' && !req.headers.origin?.startsWith('http://127.0.0.1:')) {
 		res.status(500).send();
 		return;
 	}
